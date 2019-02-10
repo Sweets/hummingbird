@@ -1,0 +1,4 @@
+echo "Hummingbird initializing system"
+echo "/etc/rc"
+
+sleep infinity

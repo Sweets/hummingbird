@@ -1,0 +1,3 @@
+echo "/etc/rc.shutdown"
+
+sync
