@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <sys/wait.h>
@@ -15,9 +16,9 @@ void poweroff(void);
 void restart(void);
 void signal_handler(int);
 
-const char *shell = "/bin/sh";
-const char *init = "/etc/rc";
-const char *shutdown = "/etc/rc.shutdown";
+char *shell = "/bin/sh";
+char *init = "/etc/rc";
+char *shutdown = "/etc/rc.shutdown";
 
 void (*sighandler_map[])(void) = {
 	[SIGINT]	= restart,
@@ -59,27 +60,29 @@ void signal_handler(int signal) {
 int main(int argc, char **argv){
 	if (getpid() > 1) {
 		int uid = getuid();
-		int argument;
 
 		if (uid) {
 			printf("%s\n", "root access required");
 			exit(EXIT_FAILURE);
 		}
 
-		while ((argument = getopt(argc, argv, "rs")) != -1) {
-			switch (argument) {
-				case 's':
-					kill(1, SIGUSR1);
-					exit(EXIT_SUCCESS);
-					break;
-				case 'r':
-					kill(1, SIGINT);
-					exit(EXIT_SUCCESS);
+		int queuedsig;
+		if (length(argv) == 2) {
+			if (strcmp(argv[1], "shutdown") == 0) {
+				queuedsig = SIGUSR1;
+			} else if (strcmp(argv[1], "restart") == 0) {
+				queuedsig = SIGINT;
+			}
+
+			if (queuedsig) {
+				kill(1, queuedsig);
+				exit(EXIT_SUCCESS);
 			}
 		}
 
 		printf("%s\n%s\n%s\n", "Hummingbird v0.1",
-				"-s\tShutdown", "-r\tRestart");
+				"shutdown\tShuts down the system",
+				"restart\tRestarts the system");
 
 		return 0;
 	}
