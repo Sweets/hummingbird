@@ -10,24 +10,25 @@
 
 #define length(alpha) (sizeof(alpha)/sizeof*(alpha))
 
-void execute(char *);
-void shutdown(void);
+void execute(char*);
+void poweroff(void);
 void restart(void);
 void signal_handler(int);
 
+const char *shell = "/bin/sh";
+const char *init = "/etc/rc";
+const char *shutdown = "/etc/rc.shutdown";
+
 void (*sighandler_map[])(void) = {
 	[SIGINT]	= restart,
-	[SIGUSR1]	= shutdown,
+	[SIGUSR1]	= poweroff,
 }; /* In anticipation for more signals to be handled */
 
 void execute(char *script) {
-	char *shell = "/bin/sh";
 	char *command[] = {shell, script, NULL};
-
 	pid_t process;
 	switch (process = fork()) {
 		case -1:
-			return;
 			break;
 		case 0:
 			execv(shell, command);
@@ -38,7 +39,7 @@ void execute(char *script) {
 	}
 }
 
-void shutdown() {
+void poweroff() {
 	reboot(LINUX_REBOOT_CMD_POWER_OFF);
 }
 
@@ -51,7 +52,7 @@ void signal_handler(int signal) {
 	sleep(1);
 	kill(-1, SIGKILL);
 
-	execute("/etc/rc.shutdown");
+	execute(shutdown);
 	sighandler_map[signal]();
 }
 
@@ -60,7 +61,7 @@ int main(int argc, char **argv){
 		int uid = getuid();
 		int argument;
 
-		if (uid != 0) {
+		if (uid) {
 			printf("%s\n", "root access required");
 			exit(EXIT_FAILURE);
 		}
@@ -84,15 +85,15 @@ int main(int argc, char **argv){
 	}
 
 	for (unsigned int index = 0; index < length(sighandler_map); index++) {
-		if (sighandler_map[index] != NULL)
+		if (sighandler_map[index] != NULL) {
 			signal(index, signal_handler);
+		}
 	}
 
-	reboot(LINUX_REBOOT_CMD_CAD_OFF);
-	/* Send SIGINT on three-finger salute */
-
-	execute("/etc/rc");
-	execute("/etc/rc.shutdown");
+	reboot(LINUX_REBOOT_CMD_CAD_OFF); /* Send SIGINT on three-finger salute */
+	
+	execute(init);
+	execute(shutdown);
 
 	return 0;
 }
