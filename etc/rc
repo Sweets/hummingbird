@@ -71,7 +71,7 @@ sysctl --system > /dev/null
 
 # Set random seed
 
-if [ -f "/etc/rc.local "]; then
+if [ -f "/etc/rc.local" ]; then
     output " ... Running /etc/rc.local"
     sh /etc/rc.local
 fi
