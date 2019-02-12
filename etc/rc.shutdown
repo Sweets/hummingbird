@@ -2,6 +2,8 @@
 
 echo "/etc/rc.shutdown"
 
-sh /etc/rc.shutdown.local
+[ -f "/etc/rc.shutdown.local" ] && sh /etc/rc.shutdown.local
 
 sync
+swapoff -a
+umount -a -r
