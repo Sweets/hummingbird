@@ -51,7 +51,7 @@ output " ... Setting up udev"
 /lib/systemd/systemd-udevd --daemon 2>1 > /dev/null
 udevadm trigger --action=add --type=subsystems
 udevadm trigger --action=add --type=devices
-udevadm settle
+udevadm settle & # Not sure if this is necessarily a good idea
 
 output " ... Mounting root filesystem"
 # TODO: support for other filesystems (btrfs, zfs, etc)
