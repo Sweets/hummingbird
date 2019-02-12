@@ -1,3 +1,5 @@
 echo "/etc/rc.shutdown"
 
+sh /etc/rc.shutdown.local
+
 sync

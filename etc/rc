@@ -1,4 +1,6 @@
 echo "Hummingbird initializing system"
 echo "/etc/rc"
 
+sh /etc/rc.local
+
 sleep infinity
