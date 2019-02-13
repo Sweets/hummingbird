@@ -6,8 +6,11 @@ output(){
     [ "x$SILENT" = "x0" ] && echo $@
 }
 
-if [ -f "/etc/issue" ]; then
-    output "Hummingbird - `cat /etc/issue`"
+if [ -f "/etc/os-release" ]; then
+    {
+        eval /etc/os-release
+        output "Hummingbird - ${PRETTY_NAME}"
+    }
 else
     output "Hummingbird initializing system"
 fi
@@ -33,16 +36,16 @@ mountpoint -q /dev/shm ||
 mountpoint -q /sys/fs/cgroup ||
     mount -n -t cgroup nodev /sys/fs/cgroup
 
-IFS='
-'
-for cgroup in `awk '$4 == 1' /proc/cgroups`; do
-    cgroup=`echo $cgroup | awk '{print $1}'`
-    mountpoint -q /sys/fs/cgroup/$cgroup || {
-        mkdir -p /sys/fs/cgroup/$cgroup
-        mount -t cgroup cgroup /sys/fs/cgroup/$cgroup -o $cgroup
-    }
-done
-unset IFS
+#IFS='
+#'
+#for cgroup in `awk '$4 == 1' /proc/cgroups`; do
+#    cgroup=`echo $cgroup | awk '{print $1}'`
+#    mountpoint -q /sys/fs/cgroup/$cgroup || {
+#        mkdir -p /sys/fs/cgroup/$cgroup
+#        mount -t cgroup cgroup /sys/fs/cgroup/$cgroup -o $cgroup
+#    }
+#done
+#unset IFS
 
 output " ... Setting up udev"
 
@@ -69,7 +72,7 @@ ip link set up dev lo
 output " ... Setting up sysctl"
 sysctl --system > /dev/null
 
-# Set random seed
+# TODO: Set random seed
 
 if [ -f "/etc/rc.local" ]; then
     output " ... Running /etc/rc.local"
@@ -88,4 +91,5 @@ for index in `seq 1 8`; do
     respawn "agetty 115200,38400,9600 tty${index} linux"
 done
 
+# TODO: change this, it's not very portable
 sleep infinity
