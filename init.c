@@ -97,6 +97,7 @@ int main(int argc, char **argv){
 	
 	execute(init);
 	execute(shutdown);
+	poweroff();
 
 	return 0;
 }
