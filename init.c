@@ -67,10 +67,10 @@ int main(int argc, char **argv){
 		}
 
 		int queuedsig;
-		if (length(argv) == 2) {
-			if (strcmp(argv[1], "shutdown") == 0) {
+		if (argc == 2) {
+			if (!strcmp(argv[1], "shutdown")) {
 				queuedsig = SIGUSR1;
-			} else if (strcmp(argv[1], "restart") == 0) {
+			} else if (!strcmp(argv[1], "restart")) {
 				queuedsig = SIGINT;
 			}
 
@@ -87,13 +87,12 @@ int main(int argc, char **argv){
 		return 0;
 	}
 
-	for (unsigned int index = 0; index < length(sighandler_map); index++) {
-		if (sighandler_map[index] != NULL) {
+	for (unsigned int index = 0; index < length(sighandler_map); index++)
+		if (sighandler_map[index] != NULL)
 			signal(index, signal_handler);
-		}
-	}
 
-	reboot(LINUX_REBOOT_CMD_CAD_OFF); /* Send SIGINT on three-finger salute */
+	reboot(LINUX_REBOOT_CMD_CAD_OFF);
+        /* Send SIGINT on three-finger salute */
 	
 	execute(init);
 	execute(shutdown);
