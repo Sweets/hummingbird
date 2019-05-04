@@ -24,16 +24,16 @@ void execute(char *path) {
         waitpid(process, NULL, 0);
 }
 
-void handle_signal(int signal) {
+void handle_signal(int received) {
     if (!signal) {
         // This is in a loop for future proofing
         unsigned int signal_map_size = sizeof(signal_map)/sizeof*(signal_map);
         for (unsigned int index = 0; index < signal_map_size; index++)
             if (signal_map[index] && index > 0)
-                signal(index, signal_handler);
+                signal(index, handle_signal);
     } else {
-        if (signal_map[signal])
-            signal_map[signal]();
+        if (signal_map[received])
+            signal_map[received]();
     }
 }
 
@@ -48,7 +48,7 @@ void initialize_system() {
 }
 
 int main(int argc, char **argv) {
-    handle_signal(NULL);
+    handle_signal(0);
 
     if (!getpid())
         initialize_system();
