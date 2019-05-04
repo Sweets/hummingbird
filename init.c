@@ -3,100 +3,56 @@
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
-
 #include <sys/wait.h>
 #include <sys/reboot.h>
-
 #include <linux/reboot.h>
 
-#define length(alpha) (sizeof(alpha)/sizeof*(alpha))
+#include "signals.h"
 
-void execute(char*);
-void poweroff(void);
-void restart(void);
-void signal_handler(int);
+#define shell "/bin/sh"
+#define init "/etc/rc.init"
+#define shutdown "/etc/rc.shutdown"
 
-char *shell = "/bin/sh";
-char *init = "/etc/rc";
-char *shutdown = "/etc/rc.shutdown";
+void execute(char *path) {
+    char *command[] = {shell, path, NULL};
 
-void (*sighandler_map[])(void) = {
-	[SIGINT]	= restart,
-	[SIGUSR1]	= poweroff,
-}; /* In anticipation for more signals to be handled */
+    pid_t process = fork();
 
-void execute(char *script) {
-	char *command[] = {shell, script, NULL};
-	pid_t process;
-	switch (process = fork()) {
-		case -1:
-			break;
-		case 0:
-			execv(shell, command);
-			break;
-		default:
-			waitpid(process, NULL, 0);
-			break;
-	}
+    if (process == 0)
+        execv(shell, command);
+    else if (process > 0)
+        waitpid(process, NULL, 0);
 }
 
-void poweroff() {
-	reboot(LINUX_REBOOT_CMD_POWER_OFF);
+void handle_signal(int signal) {
+    if (!signal) {
+        // This is in a loop for future proofing
+        unsigned int signal_map_size = sizeof(signal_map)/sizeof*(signal_map);
+        for (unsigned int index = 0; index < signal_map_size; index++)
+            if (signal_map[index] && index > 0)
+                signal(index, signal_handler);
+    } else {
+        if (signal_map[signal])
+            signal_map[signal]();
+    }
 }
 
-void restart() {
-	reboot(LINUX_REBOOT_CMD_RESTART);
+void handle_commandline() {
 }
 
-void signal_handler(int signal) {
-	kill(-1, SIGTERM);
-	sleep(1);
-	kill(-1, SIGKILL);
+void initialize_system() {
+    reboot(LINUX_REBOOT_CMD_CAD_OFF); // Sends SIGINT on three-finger salute
 
-	execute(shutdown);
-	sighandler_map[signal]();
+    execute(init);
+    // TODO: if the init ever ends, drop the user into an emergency shell
 }
 
-int main(int argc, char **argv){
-	if (getpid() > 1) {
-		int uid = getuid();
+int main(int argc, char **argv) {
+    handle_signal(NULL);
 
-		if (uid) {
-			printf("%s\n", "root access required");
-			exit(EXIT_FAILURE);
-		}
-
-		int queuedsig;
-		if (argc == 2) {
-			if (!strcmp(argv[1], "shutdown")) {
-				queuedsig = SIGUSR1;
-			} else if (!strcmp(argv[1], "restart")) {
-				queuedsig = SIGINT;
-			}
-
-			if (queuedsig) {
-				kill(1, queuedsig);
-				exit(EXIT_SUCCESS);
-			}
-		}
-
-		printf("%s\n%s\n%s\n", "Hummingbird v0.1",
-				"shutdown\tShuts down the system",
-				"restart\tRestarts the system");
-
-		return 0;
-	}
-
-	for (unsigned int index = 0; index < length(sighandler_map); index++)
-		if (sighandler_map[index] != NULL)
-			signal(index, signal_handler);
-
-	reboot(LINUX_REBOOT_CMD_CAD_OFF);
-        /* Send SIGINT on three-finger salute */
-	
-	execute(init);
-	execute(shutdown);
-	poweroff();
-
-	return 0;
+    if (!getpid())
+        initialize_system();
+    else
+        handle_commandline();
 }
+
