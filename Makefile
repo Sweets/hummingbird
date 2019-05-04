@@ -2,7 +2,7 @@ CC	= gcc
 
 all: build
 
-build: init.c
+build: src/init.c
 	$(CC) src/signals.c src/init.c -o hummingbird.o
 
 install: all

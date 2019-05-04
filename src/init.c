@@ -36,14 +36,29 @@ void handle_signal(int received) {
     }
 }
 
-void handle_commandline() {
+void handle_commandline(int argc, char **argv) {
+    int queued_signal;
+
+    if (argc == 2) {
+        if (!strcmp(argv[1], "shutdown"))
+            queued_signal = SIGUSR1;
+        else if (!strcmp(argv[1], "restart"))
+            queued_signal = SIGINT;
+    }
+
+    if (queued_signal)
+        kill(1, queued_signal);
+    else
+        exit(EXIT_FAILURE);
 }
 
 void initialize_system() {
     reboot(LINUX_REBOOT_CMD_CAD_OFF); // Sends SIGINT on three-finger salute
 
     execute(init);
-    // TODO: if the init ever ends, drop the user into an emergency shell
+    // if the init ever ends, drop the user into an emergency shell
+    printf("%s\n", "Init ended, dropping into emergency shell.");
+    execute(shell);
 }
 
 int main(int argc, char **argv) {
@@ -52,6 +67,8 @@ int main(int argc, char **argv) {
     if (!getpid())
         initialize_system();
     else
-        handle_commandline();
+        handle_commandline(argc, argv);
+
+    return EXIT_SUCCESS;
 }
 
