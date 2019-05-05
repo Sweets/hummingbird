@@ -1,0 +1,48 @@
+#!/bin/sh
+
+[[ -f "/etc/os-release" ]] && {
+    eval $(cat /etc/os-release) # here be dragons
+    echo -e "hummingbird - \033[${ANSI_COLOR}m${PRETTY_NAME}\033[0m"
+} || echo "hummingbird - $(uname -sr)"
+
+_mount(){
+    mountpoint -q $1 || mount -t $2 $3 $1 -o $4
+}
+
+_mount /proc proc proc nosuid,noexec,nodev
+_mount /sys sysfs sys nosuid,noexec,nodev
+_mount /run tmpfs run mode=0755,nosuid,nodev
+_mount /dev devtmpfs dev mode=0755,nosuid
+
+mkdir -p -m0755 /dev/{pts,shm} /run/lock
+
+_mount /dev/pts devpts devpts mode=0620,gid=5,nosuid,noexec
+_mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
+
+mount -o remount,rw /
+swapon -a
+
+sysctl --system > /dev/null
+
+# TODO: fucking change this systemd dep already, just haven't gotten to it yet
+/lib/systemd/systemd-udevd --daemon &>/dev/null
+udevadm trigger --action=add --type=subsystems
+udevadm trigger --action=add --type=devices
+udevadm settle &
+
+cat /etc/hostname >| /proc/sys/kernel/hostname
+ip link set up dev lo
+
+[[ -f "/etc/rc.local" ]] && sh /etc/rc.local
+
+_respawn() {
+    (while :; do eval $1 done)
+}
+
+for index in $(seq 1 8); do
+    _respawn "agetty 115200,38400,9600 tty${index} linux"
+done
+
+while :; do
+    sleep 2147483648 # 2^31
+done
