@@ -64,7 +64,7 @@ void initialize_system() {
 int main(int argc, char **argv) {
     handle_signal(0);
 
-    if (!getpid())
+    if (getpid() == 1)
         initialize_system();
     else
         handle_commandline(argc, argv);
