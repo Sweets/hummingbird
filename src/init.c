@@ -25,50 +25,31 @@ void execute(char *path) {
 }
 
 void handle_signal(int received) {
-    if (!signal) {
-        // This is in a loop for future proofing
-        for (unsigned int index = 0; index < SIGUNUSED; index++)
-            if (signal_map[index] && index > 0)
-                signal(index, handle_signal);
-    } else {
-        if (signal_map[received])
-            signal_map[received]();
-    }
-}
-
-void handle_commandline(int argc, char **argv) {
-    int queued_signal;
-
-    if (argc == 2) {
-        if (!strcmp(argv[1], "shutdown"))
-            queued_signal = SIGUSR1;
-        else if (!strcmp(argv[1], "restart"))
-            queued_signal = SIGINT;
-    }
-
-    if (queued_signal)
-        kill(1, queued_signal);
-    else
-        exit(EXIT_FAILURE);
+    if (signal_map[received])
+        signal_map[received]();
 }
 
 void initialize_system() {
     reboot(LINUX_REBOOT_CMD_CAD_OFF); // Sends SIGINT on three-finger salute
 
-    execute(init);
+    execute(init); // the rc should block infinitely,
     // if the init ever ends, drop the user into an emergency shell
     printf("%s\n", "Init ended, dropping into emergency shell.");
     system(shell);
 }
 
 int main(int argc, char **argv) {
-    handle_signal(0);
-
-    if (getpid() == 1)
-        initialize_system();
-    else
-        handle_commandline(argc, argv);
-
-    return EXIT_SUCCESS;
+    if (getpid() > 1) {
+        printf("%s\n", "hummingbird must be ran as PID 1.");
+        return EXIT_FAILURE;
+    }
+    
+    for (unsigned int index = 0; index < SIGUNUSED; index++)
+        if (signal_map[index])
+            signal(index, handle_signal);
+    
+    initialize_system();
+    
+    return EXIT_FAILURE; // this should not be reached
 }
 
