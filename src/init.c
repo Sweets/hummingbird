@@ -58,7 +58,7 @@ void initialize_system() {
     execute(init);
     // if the init ever ends, drop the user into an emergency shell
     printf("%s\n", "Init ended, dropping into emergency shell.");
-    execute(shell);
+    system(shell);
 }
 
 int main(int argc, char **argv) {
