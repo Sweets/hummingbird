@@ -11,3 +11,5 @@ It is BSD-esque in configuration, meaning that to add start programs at boot-tim
 |`/etc/rc.local`|Executes various user-defined operations (runs after `/etc/rc.init`)|
 |`/etc/rc.shutdown`|Executes queued I/O write ops, turns off swap, unmounts mounted filesystems|
 |`/etc/rc.shutdown.local`|Executes various user-defined operations (runs before `/etc/rc.shutdown`)|
+
+By default, `.local` files do not exist, and should be added by the user if necessary.
