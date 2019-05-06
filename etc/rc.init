@@ -4,7 +4,7 @@ if [ -f "/etc/os-release" ]
 then
     {
         eval $(cat /etc/os-release) # here be dragons
-        echo -e "hummingbird - \033[${ANSI_COLOR}m${PRETTY_NAME}\033[0m"
+        echo "hummingbird - \033[${ANSI_COLOR}m${PRETTY_NAME}\033[0m"
     }
 else
     echo "hummingbird - $(uname -sr)"
@@ -33,7 +33,7 @@ sysctl --system > /dev/null
 /lib/systemd/systemd-udevd --daemon &>/dev/null
 udevadm trigger --action=add --type=subsystems
 udevadm trigger --action=add --type=devices
-udevadm settle &
+udevadm settle
 
 cat /etc/hostname >| /proc/sys/kernel/hostname
 ip link set up dev lo
