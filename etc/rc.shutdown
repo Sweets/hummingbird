@@ -1,8 +1,9 @@
 #!/bin/sh
 
-echo "/etc/rc.shutdown"
-
-[ -f "/etc/rc.shutdown.local" ] && sh /etc/rc.shutdown.local
+if [ -f "/etc/rc.shutdown.local" ]
+then
+    sh /etc/rc.shutdown.local
+fi
 
 sync
 swapoff -a
