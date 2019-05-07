@@ -3,7 +3,7 @@
 if [ -f "/etc/os-release" ]
 then
     {
-        eval $(cat /etc/os-release) # here be dragons
+        export $(cat /etc/os-release) # here be dragons
         echo "hummingbird - \033[${ANSI_COLOR}m${PRETTY_NAME}\033[0m"
     }
 else
