@@ -103,8 +103,4 @@ do
     }
 done
 
-if [ "$getty_command" = "" ]
-then
-    echo "No getty command found, dropping init"
-    exit 1
-fi
+echo "No getty command found, dropping init"
