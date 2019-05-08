@@ -5,6 +5,7 @@ then
     sh /etc/rc.shutdown.local
 fi
 
+rm -rf /tmp/* /var/tmp/*
 sync
 swapoff -a
 umount -a -r
