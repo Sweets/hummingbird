@@ -1,11 +1,9 @@
 #!/bin/sh
 
-clear
-
-echo "hummingbird - $(uname -sr)"
+printf '\033[2J\033[H%s\n' "hummingbird - $(uname -sr)"
 
 _mount(){
-    mountpoint -q $1 || mount -t $2 $3 $1 -o $4
+    mountpoint -q "$1" || mount -t "$2" "$3" "$1" -o "$4"
 }
 
 _mount /proc proc proc nosuid,noexec,nodev
@@ -41,7 +39,7 @@ _respawn() {
     (while :; do eval $1 done)
 }
 
-for index in $(seq 1 8); do
+for index in 1 2 3 4 5 6 7 8; do
     _respawn "agetty 115200,38400,9600 tty${index} linux"
 done
 
