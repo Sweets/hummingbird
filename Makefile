@@ -8,4 +8,4 @@ build: src/init.c
 install: all
 	install -Dm755 "hummingbird.o" "/usr/bin/hummingbird"
 	install -Dm755 "shutdown.sh" "/usr/bin/shutdown"
-	install -Dm755 "restart.sh" "/usr/bin/restart"
+	install -Dm755 "reboot.sh" "/usr/bin/reboot"
