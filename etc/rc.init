@@ -19,7 +19,58 @@ _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
 mount -o remount,rw /
 swapon -a
 
-sysctl --system > /dev/null
+sysctl --system 2>1 >/dev/null
+
+if [ "$?" != "0" ]
+then
+    # reimplement --system (try --system flag first because it's faster than this implementation)
+    
+    control_files=""
+    
+    directories="/etc /run /usr/local/lib /usr/lib /lib"
+    for directory in $directories
+    do
+        directory="$directory/sysctl.d"
+        if [ -d "$directory" ] && [ -n "$(ls directory)" ]
+        then
+            for file in $directory/*
+            do
+                control_files="$control_files $file"
+            done
+        fi
+    done
+    
+    control_file_cache=$control_files
+    control_files=""
+    
+    for control_file in $control_file_cache
+    do
+        skip_file=0
+        for file in $control_files
+        do
+            if [ "$(basename $control_file)" = "$(basename $file)" ]
+            then
+                skip_file=1
+            fi
+        done
+        
+        if [ "$skip_file" = "0" ]
+        then
+            control_files="$control_files $control_file"
+        fi
+    done
+fi
+
+for control_file in $control_files
+do
+    sysctl -p $control_file 2>1 >/dev/null
+    # some implementations don't allow for multiple files to pass through -p
+done
+
+if [ -f "/etc/sysctl.conf" ]
+then
+    sysctl -p /etc/sysctl.conf 2>1 >/dev/null
+fi
 
 # TODO: fucking change this systemd dep already, just haven't gotten to it yet
 /lib/systemd/systemd-udevd --daemon &>/dev/null
@@ -35,14 +86,25 @@ then
     sh /etc/rc.local
 fi
 
-_respawn() {
-    (while :; do eval $1 done)
-}
-
-for index in 1 2 3 4 5 6 7 8; do
-    _respawn "agetty 115200,38400,9600 tty${index} linux"
+for command in agetty getty
+do
+    [ "$(command -v $command)" ] && {
+        for index in 1 2 3 4 5 6 7 8
+        do
+            (while :; do
+                eval "$getty_command 115200,38400,9600 tty${index} linux"
+            done)
+        done
+    
+        while :; do
+            sleep 2147483648 # 2^31
+        done
+        break;
+    }
 done
 
-while :; do
-    sleep 2147483648 # 2^31
-done
+if [ "$getty_command" = "" ]
+then
+    echo "No getty command found, dropping init"
+    exit 1
+fi
