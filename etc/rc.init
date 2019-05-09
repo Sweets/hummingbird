@@ -46,7 +46,7 @@ then
         skip_file=0
         for file in $control_files
         do
-            if [ "$(basename $control_file)" = "$(basename $file)" ]
+            if [ "${control_file##*/}" = "${file##*/}" ]
             then
                 skip_file=1
             fi
