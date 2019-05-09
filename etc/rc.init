@@ -19,14 +19,14 @@ _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
 mount -o remount,rw /
 swapon -a
 
-sysctl --system 2>1 >/dev/null
+sysctl --system 2>&1 >/dev/null
 
 if [ "$?" != "0" ]
 then
     # reimplement --system (try --system flag first because it's faster than this implementation)
-    
+
     control_files=""
-    
+
     directories="/etc /run /usr/local/lib /usr/lib /lib"
     for directory in $directories
     do
@@ -39,10 +39,10 @@ then
             done
         fi
     done
-    
+
     control_file_cache=$control_files
     control_files=""
-    
+
     for control_file in $control_file_cache
     do
         skip_file=0
@@ -53,7 +53,7 @@ then
                 skip_file=1
             fi
         done
-        
+
         if [ "$skip_file" = "0" ]
         then
             control_files="$control_files $control_file"
@@ -63,17 +63,17 @@ fi
 
 for control_file in $control_files
 do
-    sysctl -p $control_file 2>1 >/dev/null
+    sysctl -p $control_file >/dev/null 2>&1
     # some implementations don't allow for multiple files to pass through -p
 done
 
 if [ -f "/etc/sysctl.conf" ]
 then
-    sysctl -p /etc/sysctl.conf 2>1 >/dev/null
+    sysctl -p /etc/sysctl.conf >/dev/null 2>&1
 fi
 
 # TODO: fucking change this systemd dep already, just haven't gotten to it yet
-/lib/systemd/systemd-udevd --daemon &>/dev/null
+/lib/systemd/systemd-udevd --daemon >/dev/null 2>&1
 udevadm trigger --action=add --type=subsystems
 udevadm trigger --action=add --type=devices
 udevadm settle
@@ -95,7 +95,7 @@ do
                 eval "$command 115200,38400,9600 tty${index} linux"
             done)
         done
-    
+
         while :; do
             sleep 2147483648 # 2^31
         done
