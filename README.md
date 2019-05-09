@@ -26,6 +26,8 @@ It is recommended that you set your system shell to be `dash`. Dash is a fast, P
 
 To set it as the system shell, create a symbolic link to the binary from `/bin/sh` (`ln -s /usr/bin/dash /bin/sh`).
 
+Note for advanced users: if your goal in using hummingbird is to use the fastest achievable boot time for your hardware, consider stripping the Linux kernel of unnecessary drivers that don't pertain to your hardware.
+
 ## Configuration
 
 hummingbird is BSD-esque in its configuration, meaning that to execute commands during boot (or the contrary, have them execute during shutdown) you add instructions to `.local` files.
@@ -59,7 +61,7 @@ If the emergency shell is exited (`Ctrl+D`, `$ exit`, etc) a kernel panic will b
 
 Over the years, a lot of hacks have been applied to various bits of software to make X work "seemlessly". Systemd's logind automatically applies specific ownership to files in order to allow system-level files to be accessed by a non-root user. startx itself is also quite a bit of a hack, but too much so to explain here.
 
-In order to start the X server again, you will need to add the following line to the file `/etc/X11/Xwrapper.config` (if the file does not exist, which is likely, create it)
+In order to start the X server again, you will need to add the following line to the file `/etc/X11/Xwrapper.config` (if the file does not exist -- which is likely -- create it)
 
 ```
 needs_root_rights = yes
@@ -90,6 +92,21 @@ dhcpcd
 ```
 
 Afterwards, you should have an internet connection (for wireless connections, you may need to use `wpa_supplicant`)
+
+### Plymouth soft locks my system or is shown after the system is finished booting
+
+hummingbird was tested and is known to be working with plymouth, but in testing, plymouth was slower to start than hummingbird could initialize the system. By the time the plymouth screen loaded up, a user was already able to login to a terminal, causing the screen to be taken by plymouth and appear to be "soft locked".
+
+To fix this, you need to make sure that plymouth is told to quit when hummingbird has initialized the system. In the event that you want to see the plymouth screen regardless of boot time, you may artificially delay the boot process by putting `sleep` in the `.local` file.
+
+```
+#!/bin/sh
+
+sleep 5
+plymouth --quit
+```
+
+In addition to the above, you may want to lower the `ShowDelay` variable in `/etc/plymouth/plymouth.conf` to see plymouth earlier.
 
 ### My question isn't listed!
 
