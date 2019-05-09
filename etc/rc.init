@@ -19,56 +19,23 @@ _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
 mount -o remount,rw /
 swapon -a
 
-if sysctl --system >/dev/null 2>&1
-then
-    # reimplement --system (try --system flag first because it's faster than this implementation)
+# 'sysctl --system' implementation using 'find'.
+find /run/sysctl.d \
+     /etc/sysctl.d \
+     /usr/local/lib/sysctl.d \
+     /usr/lib/sysctl.d \
+     /lib/sysctl.d \
+     /etc/sysctl.conf \
+     -name \*.conf -type f 2>/dev/null \
+| while read -r conf; do
+    seen="$seen ${conf##*/}"
 
-    control_files=""
-
-    directories="/etc /run /usr/local/lib /usr/lib /lib"
-    for directory in $directories
-    do
-        directory="$directory/sysctl.d"
-        if [ -d "$directory" ] && [ -n "$(ls directory)" ]
-        then
-            for file in $directory/*
-            do
-                control_files="$control_files $file"
-            done
-        fi
-    done
-
-    control_file_cache=$control_files
-    control_files=""
-
-    for control_file in $control_file_cache
-    do
-        skip_file=0
-        for file in $control_files
-        do
-            if [ "${control_file##*/}" = "${file##*/}" ]
-            then
-                skip_file=1
-            fi
-        done
-
-        if [ "$skip_file" = "0" ]
-        then
-            control_files="$control_files $control_file"
-        fi
-    done
-fi
-
-for control_file in $control_files
-do
-    sysctl -p $control_file >/dev/null 2>&1
-    # some implementations don't allow for multiple files to pass through -p
+    case $seen in
+        *" ${conf##*/} "*) ;;
+        *) echo "* Applying $conf ..."
+           sysctl -p "$conf" ;;
+    esac
 done
-
-if [ -f "/etc/sysctl.conf" ]
-then
-    sysctl -p /etc/sysctl.conf >/dev/null 2>&1
-fi
 
 # TODO: fucking change this systemd dep already, just haven't gotten to it yet
 /lib/systemd/systemd-udevd --daemon >/dev/null 2>&1
