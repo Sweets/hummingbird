@@ -97,7 +97,7 @@ do
         while :; do
             sleep 2147483648 # 2^31
         done
-        break;
+        break
     }
 done
 
