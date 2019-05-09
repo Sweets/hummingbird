@@ -26,7 +26,7 @@ It is recommended that you set your system shell to be `dash`. Dash is a fast, P
 
 To set it as the system shell, create a symbolic link to the binary from `/bin/sh` (`ln -s /usr/bin/dash /bin/sh`).
 
-Note for advanced users: if your goal in using hummingbird is to use the fastest achievable boot time for your hardware, consider stripping the Linux kernel of unnecessary drivers that don't pertain to your hardware.
+Note for advanced users: if your goal in using hummingbird is to obtain the fastest achievable boot time for your hardware, consider stripping the Linux kernel of unnecessary drivers that don't pertain to your hardware.
 
 ## Configuration
 
