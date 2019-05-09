@@ -58,9 +58,7 @@ type -p agetty && getty=agetty
     for index in 1 2 3 4 5 6 7 8
     do
         while :; do
-            "$getty" "115200,38400,9600" \
-                     "tty${index}" \
-                     "linux"
+            "$getty" "115200,38400,9600" "tty${index}" "linux"
         done &
     done
 
