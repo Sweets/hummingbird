@@ -19,7 +19,7 @@ _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
 mount -o remount,rw /
 swapon -a
 
-sysctl --system 2>&1 >/dev/null
+sysctl --system >/dev/null 2>&1
 
 if [ "$?" != "0" ]
 then
