@@ -46,10 +46,7 @@ udevadm settle
 cat /etc/hostname >| /proc/sys/kernel/hostname
 ip link set up dev lo
 
-if [ -f "/etc/rc.local" ]
-then
-    sh /etc/rc.local
-fi
+[ -f /etc/rc.local ] && sh /etc/rc.local
 
 type -p getty  && getty=getty
 type -p agetty && getty=agetty
