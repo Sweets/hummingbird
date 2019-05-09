@@ -19,9 +19,7 @@ _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
 mount -o remount,rw /
 swapon -a
 
-sysctl --system >/dev/null 2>&1
-
-if [ "$?" != "0" ]
+if sysctl --system >/dev/null 2>&1
 then
     # reimplement --system (try --system flag first because it's faster than this implementation)
 
