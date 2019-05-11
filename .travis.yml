@@ -5,4 +5,4 @@ os:
     - linux
 
 script:
-    - shellcheck *.sh /etc/rc.init /etc/rc.shutdown
+    - shellcheck *.sh etc/rc.init etc/rc.shutdown
