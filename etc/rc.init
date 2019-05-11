@@ -64,12 +64,12 @@ command -v mdev && udev=mdev
         esac
     done
     
-    for /sys -name modalias -type f |
-    while read -r line; do
-        IFS='
+    find /sys -name modalias -type f |
+        while read -r line; do
+            IFS='
 ' read -r alias < "$line"
-        modprobe -b -a "$alias" 2>/dev/null
-    done
+            modprobe -b -a "$alias" 2>/dev/null
+        done
 }
 
 read -r hostname /etc/hostname
