@@ -32,7 +32,7 @@ find /run/sysctl.d \
 
     case $seen in
         *" ${conf##*/} "*) ;;
-        *) echo "* Applying $conf ..."
+        *) printf '%s\n' "* Applying $conf ..."
            sysctl -p "$conf" ;;
     esac
 done
@@ -43,7 +43,9 @@ udevadm trigger --action=add --type=subsystems
 udevadm trigger --action=add --type=devices
 udevadm settle
 
-cat /etc/hostname >| /proc/sys/kernel/hostname
+read -r hostname /etc/hostname
+printf '%s\n' "$hostname" > /proc/sys/kernel/hostname
+
 ip link set up dev lo
 
 [ -f /etc/rc.local ] && . /etc/rc.local
@@ -61,4 +63,4 @@ command -v agetty && getty=agetty
     wait
 }
 
-echo "No getty command found, dropping init"
+printf '%s\n' "No getty command found, dropping init"
