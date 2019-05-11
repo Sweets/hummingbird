@@ -11,6 +11,7 @@ _mount /sys sysfs sys nosuid,noexec,nodev
 _mount /run tmpfs run mode=0755,nosuid,nodev
 _mount /dev devtmpfs dev mode=0755,nosuid
 
+# shellcheck disable=2174
 mkdir -p -m0755 /dev/pts /dev/shm /run/lock
 
 _mount /dev/pts devpts devpts mode=0620,gid=5,nosuid,noexec
