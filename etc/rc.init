@@ -38,11 +38,39 @@ find /run/sysctl.d \
     esac
 done
 
-# TODO: fucking change this systemd dep already, just haven't gotten to it yet
-/lib/systemd/systemd-udevd --daemon >/dev/null 2>&1
-udevadm trigger --action=add --type=subsystems
-udevadm trigger --action=add --type=devices
-udevadm settle
+command -v udevd && udev=udevd
+command -v mdev && udev=mdev
+
+[ "$udev" = udevd ] && {
+    udevd --daemon
+    udevadm trigger --action=add --type=subsystems
+    udevadm trigger --action=add --type=devices
+    udevadm settle
+}
+
+[ "$udev" = mdev ] && {
+    printf '%s\n' "/bin/mdev" > /proc/sys/kernel/hotplug
+    mdev -s
+    
+    for file in /sys/class/net/*/uevent; do
+        printf '%s\n' add > "$file"
+    done 2>/dev/null
+
+    for file in /sys/bus/usb/devices/*; do
+        case ${file##*/} in
+            [0-9]*-[0-9]*)
+                printf '%s\n' add > "$file/uevent"
+            ;;
+        esac
+    done
+    
+    for /sys -name modalias -type f |
+    while read -r line; do
+        IFS='
+' read -r alias < "$line"
+        modprobe -b -a "$alias" 2>/dev/null
+    done
+}
 
 read -r hostname /etc/hostname
 printf '%s\n' "$hostname" > /proc/sys/kernel/hostname
