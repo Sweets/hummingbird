@@ -8,10 +8,7 @@
 #include <linux/reboot.h>
 
 #include "signals.h"
-
-#define shell "/bin/sh"
-#define init "/etc/rc.init"
-#define shutdown "/etc/rc.shutdown"
+#include "init.h"
 
 void execute(char *path) {
     char *command[] = {shell, path, NULL};
