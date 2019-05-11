@@ -72,7 +72,7 @@ command -v mdev && udev=mdev
         done
 }
 
-read -r hostname /etc/hostname
+read -r hostname < /etc/hostname
 printf '%s\n' "$hostname" > /proc/sys/kernel/hostname
 
 ip link set up dev lo
