@@ -48,8 +48,8 @@ ip link set up dev lo
 
 [ -f /etc/rc.local ] && . /etc/rc.local
 
-type -p getty  && getty=getty
-type -p agetty && getty=agetty
+command -v getty  && getty=getty
+command -v agetty && getty=agetty
 
 [ -n "$getty" ] && {
     for index in 1 2 3 4 5 6 7 8; do
