@@ -22,10 +22,6 @@ To set hummingbird as your init you will need to add or change the `init` flag i
 
 `init=/usr/bin/hummingbird`
 
-It is recommended that you set your system shell to be `dash`. Dash is a fast, POSIX-compliant shell, and the rc files in `./etc` were created under the assumption that Dash is the system shell.
-
-To set it as the system shell, create a symbolic link to the binary from `/bin/sh` (`ln -s /usr/bin/dash /bin/sh`).
-
 Note for advanced users: if your goal in using hummingbird is to obtain the fastest achievable boot time for your hardware, consider stripping the Linux kernel of unnecessary drivers that don't pertain to your hardware.
 
 ## Configuration
