@@ -3,7 +3,10 @@
 printf '\033[2J\033[H%s\n' "hummingbird - $(uname -sr)"
 
 _mount(){
-    mountpoint -q "$1" || mount -t "$2" "$3" "$1" -o "$4"
+    mountpoint -q "$1" || {
+        [ ! -d "$1" ] && mkdir -p "$1"
+        mount -t "$2" "$3" "$1" -o "$4"
+    }
 }
 
 _mount /proc proc proc nosuid,noexec,nodev
