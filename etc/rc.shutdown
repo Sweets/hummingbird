@@ -4,6 +4,7 @@
     . /etc/rc.shutdown.local
 
 rm -rf /tmp/* /var/tmp/*
+dd count=1 bs=512 if=/dev/random of=/tmp/random.seed
 sync
 swapoff -a
 umount -a -r
