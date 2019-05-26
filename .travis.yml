@@ -6,3 +6,4 @@ os:
 
 script:
     - shellcheck -e SC1091,SC1091 *.sh ./etc/rc.init ./etc/rc.shutdown
+    - make
