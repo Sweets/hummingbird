@@ -3,7 +3,7 @@ CC	= gcc
 all: build
 
 build: src/init.c
-	$(CC) src/signals.c src/init.c -o hummingbird.o
+	$(CC) -std=c99 src/signals.c src/init.c -o hummingbird.o
 
 install: all
 	install -Dm755 "hummingbird.o" "$(DESTDIR)/usr/bin/hummingbird"
