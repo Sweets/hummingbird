@@ -1,4 +1,7 @@
 ## hummingbird
+
+[![Build Status](https://travis-ci.org/Sweets/hummingbird.svg?branch=master)](https://travis-ci.org/Sweets/hummingbird)
+
 hummingbird is an init system designed specifically for Linux and to yield fast boot times.
 
 ## Installation
