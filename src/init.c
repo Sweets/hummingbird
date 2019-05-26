@@ -17,7 +17,7 @@ void execute(char *path) {
 
     if (process == 0)
         execv(shell, command);
-    else if (process > 0)
+    else if (process)
         waitpid(process, NULL, 0);
 }
 
@@ -32,7 +32,7 @@ void initialize_system() {
     execute(init); // the rc should block infinitely,
     // if the init ever ends, drop the user into an emergency shell
     printf("%s\n", "Init ended, dropping into emergency shell.");
-    system(shell);
+    execute(NULL);
 }
 
 int main(int argc, char **argv) {
