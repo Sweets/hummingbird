@@ -78,6 +78,11 @@ command -v mdev && udev=mdev
 read -r hostname < /etc/hostname
 printf '%s\n' "$hostname" > /proc/sys/kernel/hostname
 
+[ -f /tmp/random.seed ] && {
+    cat /tmp/random.seed > /dev/urandom
+    rm /tmp/random.seed
+} || dd count=1 bs=512 if=/dev/random of=/dev/urandom
+
 ip link set up dev lo
 
 [ -f /etc/rc.local ] && . /etc/rc.local
