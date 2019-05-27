@@ -43,7 +43,7 @@ setup_sysctl() {
     done
 }
 
-setup_udev() {
+setup_hotplug() {
     command -v udevd && udev=udevd
     command -v mdev && udev=mdev
 
@@ -93,7 +93,7 @@ setup_random() {
     fi
 }
 
-setup_getty() {
+setup_tty() {
     command -v getty  && getty=getty
     command -v agetty && getty=agetty
 
@@ -116,7 +116,7 @@ main() {
 
     setup_fs
     setup_sysctl
-    setup_udev
+    setup_hotplug
     setup_hostname
     setup_random
 
@@ -124,7 +124,7 @@ main() {
 
     [ -f /etc/rc.local ] && . /etc/rc.local
 
-    setup_getty
+    setup_tty
 }
 
 main
