@@ -1,105 +1,130 @@
 #!/bin/sh
 
-printf '\033[2J\033[H%s\n' "hummingbird - $(uname -sr)"
+setup_fs() {
+    _mount(){
+        mountpoint -q "$1" || {
+            [ -d "$1" ] || mkdir -p "$1"
+            mount -t "$2" "$3" "$1" -o "$4"
+        }
+    }
 
-_mount(){
-    mountpoint -q "$1" || {
-        [ ! -d "$1" ] && mkdir -p "$1"
-        mount -t "$2" "$3" "$1" -o "$4"
+    _mount /proc proc proc nosuid,noexec,nodev
+    _mount /sys sysfs sys nosuid,noexec,nodev
+    _mount /run tmpfs run mode=0755,nosuid,nodev
+    _mount /dev devtmpfs dev mode=0755,nosuid
+
+    # shellcheck disable=2174
+    mkdir -p -m0755 /dev/pts /dev/shm /run/lock
+
+    _mount /dev/pts devpts devpts mode=0620,gid=5,nosuid,noexec
+    _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
+
+    mount -o remount,rw /
+    swapon -a
+}
+
+setup_sysctl() {
+    # 'sysctl --system' implementation using 'find'.
+    find /run/sysctl.d \
+         /etc/sysctl.d \
+         /usr/local/lib/sysctl.d \
+         /usr/lib/sysctl.d \
+         /lib/sysctl.d \
+         /etc/sysctl.conf \
+         -name \*.conf -type f 2>/dev/null \
+    | while read -r conf; do
+        seen="$seen ${conf##*/}"
+
+        case $seen in
+            *" ${conf##*/} "*) ;;
+            *) printf '%s\n' "* Applying $conf ..."
+               sysctl -p "$conf" ;;
+        esac
+    done
+}
+
+setup_udev() {
+    command -v udevd && udev=udevd
+    command -v mdev && udev=mdev
+
+    [ "$udev" = udevd ] && {
+        udevd --daemon
+        udevadm trigger --action=add --type=subsystems
+        udevadm trigger --action=add --type=devices
+        udevadm settle
+    }
+
+    [ "$udev" = mdev ] && {
+        printf '%s\n' "/bin/mdev" > /proc/sys/kernel/hotplug
+        mdev -s
+
+        for file in /sys/class/net/*/uevent; do
+            printf '%s\n' add > "$file"
+        done 2>/dev/null
+
+        for file in /sys/bus/usb/devices/*; do
+            case ${file##*/} in
+                [0-9]*-[0-9]*)
+                    printf '%s\n' add > "$file/uevent"
+                ;;
+            esac
+        done
+
+        find /sys -name modalias -type f |
+            while read -r line; do
+                IFS='
+    ' read -r alias < "$line"
+                modprobe -b -a "$alias" 2>/dev/null
+            done
     }
 }
 
-_mount /proc proc proc nosuid,noexec,nodev
-_mount /sys sysfs sys nosuid,noexec,nodev
-_mount /run tmpfs run mode=0755,nosuid,nodev
-_mount /dev devtmpfs dev mode=0755,nosuid
-
-# shellcheck disable=2174
-mkdir -p -m0755 /dev/pts /dev/shm /run/lock
-
-_mount /dev/pts devpts devpts mode=0620,gid=5,nosuid,noexec
-_mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
-
-mount -o remount,rw /
-swapon -a
-
-# 'sysctl --system' implementation using 'find'.
-find /run/sysctl.d \
-     /etc/sysctl.d \
-     /usr/local/lib/sysctl.d \
-     /usr/lib/sysctl.d \
-     /lib/sysctl.d \
-     /etc/sysctl.conf \
-     -name \*.conf -type f 2>/dev/null \
-| while read -r conf; do
-    seen="$seen ${conf##*/}"
-
-    case $seen in
-        *" ${conf##*/} "*) ;;
-        *) printf '%s\n' "* Applying $conf ..."
-           sysctl -p "$conf" ;;
-    esac
-done
-
-command -v udevd && udev=udevd
-command -v mdev && udev=mdev
-
-[ "$udev" = udevd ] && {
-    udevd --daemon
-    udevadm trigger --action=add --type=subsystems
-    udevadm trigger --action=add --type=devices
-    udevadm settle
+setup_hostname() {
+    read -r hostname < /etc/hostname
+    printf '%s\n' "$hostname" > /proc/sys/kernel/hostname
 }
 
-[ "$udev" = mdev ] && {
-    printf '%s\n' "/bin/mdev" > /proc/sys/kernel/hotplug
-    mdev -s
-    
-    for file in /sys/class/net/*/uevent; do
-        printf '%s\n' add > "$file"
-    done 2>/dev/null
+setup_random() {
+    if [ -f /tmp/random.seed ]; then
+        cat /tmp/random.seed > /dev/urandom
+        rm /tmp/random.seed
+    else
+        dd count=1 bs=512 if=/dev/random of=/dev/urandom
+    fi
+}
 
-    for file in /sys/bus/usb/devices/*; do
-        case ${file##*/} in
-            [0-9]*-[0-9]*)
-                printf '%s\n' add > "$file/uevent"
-            ;;
-        esac
-    done
-    
-    find /sys -name modalias -type f |
-        while read -r line; do
-            IFS='
-' read -r alias < "$line"
-            modprobe -b -a "$alias" 2>/dev/null
+setup_getty() {
+    command -v getty  && getty=getty
+    command -v agetty && getty=agetty
+
+    [ -n "$getty" ] && {
+        for index in 1 2 3 4 5 6 7 8; do
+            while :; do
+                "$getty" "115200,38400,9600" "tty${index}" "linux"
+            done &
         done
+
+        wait
+    }
+
+    printf '%s\n' "No getty command found, dropping init"
 }
 
-read -r hostname < /etc/hostname
-printf '%s\n' "$hostname" > /proc/sys/kernel/hostname
+main() {
+    printf '\033[2J\033[Hhummingbird - '
+    uname -sr
 
-if [ -f /tmp/random.seed ]; then
-    cat /tmp/random.seed > /dev/urandom
-    rm /tmp/random.seed
-else
-    dd count=1 bs=512 if=/dev/random of=/dev/urandom
-fi
+    setup_fs
+    setup_sysctl
+    setup_udev
+    setup_hostname
+    setup_random
 
-ip link set up dev lo
+    ip link set up dev lo
 
-[ -f /etc/rc.local ] && . /etc/rc.local
+    [ -f /etc/rc.local ] && . /etc/rc.local
 
-command -v getty  && getty=getty
-command -v agetty && getty=agetty
-
-[ -n "$getty" ] && {
-    for index in 1 2 3 4 5 6 7 8; do
-        while :; do
-            "$getty" "115200,38400,9600" "tty${index}" "linux"
-        done &
-    done
-
-    wait
+    setup_getty
 }
 
-printf '%s\n' "No getty command found, dropping init"
+main
