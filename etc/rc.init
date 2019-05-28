@@ -17,7 +17,7 @@ setup_fs() {
     mkdir -p -m0755 /dev/pts /dev/shm /run/lock
 
     _mount /dev/pts devpts devpts mode=0620,gid=5,nosuid,noexec
-    _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
+    _mount /dev/shm tmpfs shm mode=1777,nosuid,nodev
 
     mount -o remount,rw /
     mount -a
