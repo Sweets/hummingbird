@@ -20,6 +20,7 @@ setup_fs() {
     _mount /dev/shm tmpfs shm=mode=1777,nosuid,nodev
 
     mount -o remount,rw /
+    mount -a
     swapon -a
 }
 
