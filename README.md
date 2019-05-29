@@ -1,5 +1,5 @@
 <div align="center">
-<img src="hummingbird.png" width="350px">
+<img src="hummingbird.png" width="450px">
 
 <a href="https://travis-ci.org/Sweets/hummingbird"><img src="https://travis-ci.org/Sweets/hummingbird.svg?branch=master"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
