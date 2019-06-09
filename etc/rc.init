@@ -90,7 +90,7 @@ setup_random() {
         cat /tmp/random.seed > /dev/urandom
         rm /tmp/random.seed
     else
-        dd count=1 bs=512 if=/dev/random of=/dev/urandom
+        dd count=1 bs=512 if=/dev/urandom of=/tmp/random.seed
     fi
 }
 
