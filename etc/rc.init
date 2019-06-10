@@ -87,10 +87,9 @@ setup_hostname() {
 
 setup_random() {
     if [ -f /tmp/random.seed ]; then
-        cat /tmp/random.seed > /dev/urandom
-        rm /tmp/random.seed
+        cat /var/random.seed > /dev/urandom
     else
-        dd count=1 bs=512 if=/dev/random of=/dev/urandom
+        dd count=1 bs=512 if=/dev/random of=/var/random.seed
     fi
 }
 
