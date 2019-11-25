@@ -39,7 +39,7 @@ void initialize_system() {
 
 int main(int argc, char **argv) {
     if (getpid() > 1) {
-        printf("%s\n", "hummingbird must be ran as PID 1.");
+        printf("%s\n", "hummingbird must be run as PID 1.");
         return EXIT_FAILURE;
     }
     
