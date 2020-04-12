@@ -128,8 +128,7 @@ interlude:
      * These are things like hotplug, sysctl, or network things.
      */
 
-    if (access("/usr/lib/hummingbird/interlude", F_OK | X_OK))
-        execute("/usr/lib/hummingbird/interlude");
+    execute("/usr/lib/hummingbird/interlude");
 
 
     /*
