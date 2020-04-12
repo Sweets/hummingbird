@@ -5,5 +5,5 @@ os:
     - linux
 
 script:
-    - shellcheck -e SC1091,SC1091 *.sh ./etc/rc.init ./etc/rc.shutdown
+    - shellcheck -e SC1091,SC1091 *.sh ./usr/lib/hummingbird/fs ./usr/lib/hummingbird/tty ./usr/lib/hummingbird/shutdown
     - make
