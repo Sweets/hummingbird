@@ -118,7 +118,6 @@ set_hostname:
     close(file);
 
     munmap(seed, file_size);
-}
 
 interlude:
     /*
