@@ -19,6 +19,7 @@ $ git clone https://github.com/Sweets/hummingbird
 $ cd hummingbird
 $ make
 $ sudo make install
+$ sudo make seed_install
 $ sudo install -Dm755 ./etc/rc.init /etc/rc.init
 $ sudo install -Dm755 ./etc/rc.shutdown /etc/rc.shutdown
 ```
@@ -27,24 +28,41 @@ Note: copying the rc files is separate from the Makefile to prevent users from o
 
 ### Setting hummingbird as your init
 
-To set hummingbird as your init you will need to add or change the `init` flag in your kernel boot parameters.
+To set hummingbird as your init, you have two options.
+
+Firstly, if you don't want to override whatever binary exists at `/bin/init`, you can simply append the `init` flag to your kernel parameters with the path to hummingbird.
 
 `init=/usr/bin/hummingbird`
+
+If you don't care or don't have an init installed, once `make install` has been ran, move the binary to `/bin/init`
+
+`mv /usr/bin/hummingbird /bin/init`
 
 Note for advanced users: if your goal in using hummingbird is to obtain the fastest achievable boot time for your hardware, consider stripping the Linux kernel of unnecessary drivers that don't pertain to your hardware.
 
 ## Configuration
 
-hummingbird is BSD-esque in its configuration, meaning that to execute commands during boot (or the contrary, have them execute during shutdown) you add instructions to `.local` files.
+hummingbird runs the init in three major stages, the filesystem stage, the interlude, and the tty stage.
 
-By default no `.local` files exist.
+Each stage should have execute permission in the filesystem.
 
-|Path|Runtime|
-|-|-|
-|`/etc/rc.local`|Last during boot before spawning TTYs|
-|`/etc/rc.shutdown.local`|First during shutdown|
+#### Filesystem stage
 
-Note: If you choose to create `.local` files, be sure that you set them to be executable (`chmod +x /etc/...`).
+hummingbird will mount all psuedo-filesystems required by the linux kernel for you. Once these filesystems have been mounted, hummingbird will then execute whatever is located at `/usr/lib/hummingbird/fs` (the filesystem stage). By the end of this stage, hummingbird expects that the root be remounted as RW (if it wasn't already), all necessary file systems have been mounted, and swap has been activated. Additionally, any filesystem integrity checks as well as filesystem decryption should be done during this stage as well.
+
+After the filesystem stage, the hostname for the system is set. hummingbird will map the contents of `/etc/hostname` to memory and write them to the appropriate path to set the system's hostname. Once the hostname has been set hummingbird will seed the random number generator. The seed file is located at `/usr/lib/hummingbird/random.seed`. This file should be created during the building of hummingbird.
+
+#### Interlude
+
+The second stage is the interlude. This is where anything that is necessary to the system but is not a filesystem, nor is it related to spawning ttys is ran. This would include things like setting up hotplug for devices, running sysctl, or probing necessary modules for the system. By default, nothing exists at `/usr/lib/hummingbird/interlude` because hummingbird only does the minimum necessary to boot a system out of the box.
+
+Additionally, a user may opt to setup wireless devices, acpi, or any other programs deemed necessary at boot.
+
+#### TTY Stage
+
+The final stage of hummingbird is the tty stage. This is solely to spawn TTYs for the system. In theory, this is the only mandatory file that needs to exist for hummingbird to successfully initialize a system.
+
+Any TTY spawned in this stage should be forked to the background, but should also constantly respawn if killed. The script should block indefinitely to prevent hummingbird from dropping from initialization stages to an emergency shell.
 
 ## Emergency Shell
 
@@ -52,10 +70,6 @@ If for any reason during the system's boot time the init fails, hummingbird imme
 
 While in the emergency shell, you have full root access to the system. From here you may edit the rc files to fix and repair the init as needed.
 
-After saving your changes to the rc files, you may attempt to initialize the system again or reboot.
+Once you have finished maintenance on the system, simply exit the emergency shell (`Ctrl+D`, `$ exit`, etc). hummingbird will immediately restart the system.
 
-If you choose to attempt to initialize the system again, simply run `sh /etc/rc.init` in the emergency shell. If it fails again, you will be dropped back into the shell.
-
-If you choose to restart the system, you will need to run the `sync` command (this will commit any cached or queued I/O operations that the kernel has not done on the disk yet. Failure to do this command before restarting your machine from the emergency shell will cause any file changes to not be written to the disk).
-
-If the emergency shell is exited (`Ctrl+D`, `$ exit`, etc) a kernel panic will be raised.
+Note that there is a possibility for the system to boot-loop if the necessary initialization scripts do not exist (at the minimum the `tty` script) AND there is no system shell at `/bin/sh`.
