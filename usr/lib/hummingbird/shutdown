@@ -1,0 +1,8 @@
+#!/bin/sh
+
+rm -rf /tmp/* /var/tmp/* &> /dev/null
+dd count=1 bs=512 if=/dev/random of=/usr/lib/hummingbird/random.seed &> /dev/null
+sync
+
+swapoff -a
+umount -a -r
