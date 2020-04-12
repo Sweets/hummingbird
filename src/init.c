@@ -74,17 +74,17 @@ int main(int argc, char **argv) {
      */
 
     char *hostname = "linux";
-    if (access("/etc/hostname", F_OK | R_OK)) {
-        if ((file = open("/etc/hostname", O_RDONLY)) < 0 ||
-            fstat(file, &file_status) < 0)
-            goto set_hostname;
+    if ((file = open("/etc/hostname", O_RDONLY)) < 0 ||
+        fstat(file, &file_status) < 0)
+        goto set_hostname;
 
-        file_size = file_status.st_size;
-        hostname = (char *)mmap(0, file_size, PROT_READ, MAP_PRIVATE, file, 0);
-        close(file);
+    file_size = file_status.st_size;
+    hostname = (char *)mmap(0, file_size, PROT_READ, MAP_PRIVATE, file, 0);
+    close(file);
 
-        if (hostname == MAP_FAILED)
-            hostname = "linux";
+    if (hostname == MAP_FAILED) {
+        hostname = "linux";
+        goto set_hostname;
     }
 
 set_hostname:
@@ -98,28 +98,27 @@ set_hostname:
      */
 
     void *seed;
-    if (access("/usr/lib/hummingbird/random.seed", F_OK | R_OK)) {
-        if ((file = open("/usr/lib/hummingbird/random.seed", O_RDONLY)) < 0 ||
-            fstat(file, &file_status) < 0)
-            goto interlude;
+    if ((file = open("/usr/lib/hummingbird/random.seed", O_RDONLY)) < 0 ||
+        fstat(file, &file_status) < 0)
+        goto interlude;
 
-        file_size = file_status.st_size;
-        seed = mmap(0, file_size, PROT_READ, MAP_PRIVATE, file, 0);
-        close(file);
+    file_size = file_status.st_size;
+    seed = mmap(0, file_size, PROT_READ, MAP_PRIVATE, file, 0);
+    close(file);
 
-        if (seed == MAP_FAILED)
-            goto interlude;
+    if (seed == MAP_FAILED)
+        goto interlude;
 
-        if ((file = open("/dev/urandom", O_WRONLY)) < 0) {
-            munmap(seed, file_size);
-            goto interlude;
-        }
-
-        write(file, seed, file_size);
-        close(file);
-
+    if ((file = open("/dev/urandom", O_WRONLY)) < 0) {
         munmap(seed, file_size);
+        goto interlude;
     }
+
+    write(file, seed, file_size);
+    close(file);
+
+    munmap(seed, file_size);
+}
 
 interlude:
     /*
