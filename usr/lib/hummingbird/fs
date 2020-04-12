@@ -1,0 +1,10 @@
+#!/bin/sh
+
+mkdir -p -m0755 /dev/pts /dev/shm /run/lock
+
+mount -t devpts devpts /dev/pts -o mode=0620,gid=5,nosuid,noexec
+mount -t tmpfs shm /dev/shm -o mode=1777,nosuid,nodev
+
+mount remount,rw /
+mount -a
+swapon -a

@@ -7,6 +7,5 @@
 
 void execute(char *);
 void handle_signal(int);
-void initialize_system(void);
 
 #endif
