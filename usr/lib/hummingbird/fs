@@ -1,5 +1,5 @@
 #!/bin/sh
-
+# shellcheck disable=2174
 mkdir -p -m0755 /dev/pts /dev/shm /run/lock
 
 mount -t devpts devpts /dev/pts -o mode=0620,gid=5,nosuid,noexec
