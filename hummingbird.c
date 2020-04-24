@@ -44,7 +44,7 @@
 static const char *FALLBACK_HOSTNAME = "linux";
 static const char *SHELL = "/bin/sh";
 
-static void shutdown(int signal);
+static void handler(int signal);
 static void execute(char *path);
 
 int main(int argc, char **argv) {
@@ -61,8 +61,8 @@ int main(int argc, char **argv) {
     }
 
     /* Attach the handler to the USR1 and INT singals. */
-    signal(SIGUSR1, shutdown);
-    signal(SIGINT, shutdown);
+    signal(SIGUSR1, handler);
+    signal(SIGINT, handler);
 
     /* Setup all of the necessary virtual filesystems/mounts with correct
        permissions. */
@@ -80,8 +80,7 @@ int main(int argc, char **argv) {
     /* If /etc/hostname is inaccessible or broken, just set the hostname to
        the default. (This also populates the file status structure.) */
     if ((fd = open("/etc/hostname", O_RDONLY)) < 0 ||
-        fstat(fd, &status) < 0)
-        goto set_hostname;
+        fstat(fd, &status) < 0) goto set_hostname;
 
     /* Map the contents of /etc/hostname to our hostname variable. */
     hostname = (char *)mmap(0, status.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
@@ -91,9 +90,7 @@ int main(int argc, char **argv) {
 
     /* In the case that mapping the hostname file fails, return to the
        fallback value. */
-    if (hostname == MAP_FAILED) {
-        hostname = FALLBACK_HOSTNAME;
-    }
+    if (hostname == MAP_FAILED) hostname = FALLBACK_HOSTNAME;
 
 set_hostname:
     /* Write in the hostname variable to the hostname kernel interface. */
@@ -103,16 +100,14 @@ set_hostname:
 
     /* If the random seed doesn't exist, just go ahead to the interlude. */
     if ((fd = open("/usr/lib/hummingbird/random.seed", O_RDONLY)) < 0 ||
-        fstat(fd, &status) < 0)
-        goto interlude;
+        fstat(fd, &status) < 0) goto interlude;
 
     /* Read the random seed into memory. */
     seed = mmap(0, status.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
 
     /* If reading the random seed failed, just go ahead to the interlude. */
-    if (seed == MAP_FAILED)
-        goto interlude;
+    if (seed == MAP_FAILED) goto interlude;
 
     /* If unable to access /dev/urandom, unmap the seed and go ahead to the
        interlude. */
@@ -130,7 +125,9 @@ interlude:
     /* Run the interlude script, which is user-defined. */
     SCRIPT(interlude);
 
-    /* Disable Ctrl-Alt-Del rebooting. */
+    /* Prevent the kernel from restarting when Ctrl-Alt-Del is pressed. Will
+       still restart when its pressed, but it will do so through SIGINT to
+       PID 1 instead. */
     reboot(LINUX_REBOOT_CMD_CAD_OFF);
 
     /* Start the ttys through an external script. */
@@ -151,17 +148,29 @@ interlude:
     return EXIT_FAILURE;
 }
 
-static void shutdown(int signal) {
+static void handler(int signal) {
+    int flag;
+    
+    /* Depending on the signal we get, perform a different action. */
+    switch (signal) {
+        /* If we get an INT, restart. */
+        case SIGINT:
+            flag = LINUX_REBOOT_CMD_RESTART;
+            break;
+        /* If we get a USR1, power off. */
+        case SIGUSR1:
+            flag = LINUX_REBOOT_CMD_POWER_OFF;
+            break;
+        default:
+            return;
+    }
+
     /* Run the shutdown script. */
     SCRIPT(shutdown);
 
-    /* If there's an INT signal (^C or Ctrl-Alt-Del), reboot; otherwise, if
-       there's a USR1 signal, shutdown the system. */
-    if (signal == SIGINT) {
-        reboot(LINUX_REBOOT_CMD_RESTART);
-    } else if (signal == SIGUSR1) {
-        reboot(LINUX_REBOOT_CMD_POWER_OFF);
-    }
+    /* Use the reboot function to perform that action that the flag
+       specifies. */
+    reboot(flag);
 }
 
 static void execute(char *path) {
