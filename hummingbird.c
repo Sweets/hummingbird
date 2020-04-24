@@ -140,7 +140,7 @@ interlude:
     execute(SHELL);
 
     /* Try to restart (simulate an INT signal to the shutdown function). */
-    shutdown(SIGINT);
+    handler(SIGINT);
 
     /* If it gets to this point that means that a reboot failed which is
        _really_ bad. */
