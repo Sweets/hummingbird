@@ -1,0 +1,23 @@
+#!/bin/sh
+
+. /usr/lib/hummingbird/rc
+
+mkdir -pm 0755 /run/runit /run/lvm /run/user /run/lock /run/log \
+    /dev/pts /dev/shm
+
+mnt /dev/pts devpts devpts mode=0620,gid=5,nosuid,noexec
+mnt /dev/shm tmpfs shm mode=1777,nosuid,nodev
+
+[ -h /dev/fd     ] || ln -sf /proc/self/fd /dev/fd
+[ -h /dev/stdin  ] || ln -sf fd/0 /dev/stdin
+[ -h /dev/stdout ] || ln -sf fd/1 /dev/stdout
+[ -h /dev/stderr ] || ln -sf fd/2 /dev/stderr
+
+fsck -ATat noopts=_netdev
+[ $? -gt 1 ] && log "fsck call failed"
+
+[ -e /etc/crypttab ] && [ -x /bin/cryptsetup ] && parse_crypttab
+
+mount -o remount,rw /
+mount -a
+swapon -a

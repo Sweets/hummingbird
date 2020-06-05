@@ -1,0 +1,45 @@
+#!/bin/sh
+
+. /usr/lib/hummingbird/rc
+
+setup_hotplug(){
+    if command -v udevd >/dev/null; then
+
+        udevd -d
+        udevadm trigger -c add -t subsystems
+        udevadm trigger -c add -t devices
+        udevadm trigger -c change -t devices
+        udevadm settle
+
+    elif command -v mdev >/dev/null; then
+        mdev -s
+        mdev -df & mdev_pid=$!
+
+        [ -x /bin/dmsetup ] && dmsetup mknodes
+    fi
+}
+
+setup_sysctl(){
+    for conf in /run/sysctl.d/*.conf \
+                /etc/sysctl.d/*.conf \
+                /usr/lib/sysctl.d/*.conf \
+                /etc/sysctl.conf; do
+        [ -f "$conf" ] || break
+
+        seen="$seen ${conf##*/}"
+
+        case $seen in
+            *" ${conf##*/} "*) ;;
+            *) sysctl -p "$conf" ;;
+        esac
+    done
+}
+
+setup_hotplug
+setup_sysctl
+
+ip link set up dev lo
+
+for file in /etc/hummingbird.d/*.boot; do
+    [ -f "$file" ] && . "$file"
+done
