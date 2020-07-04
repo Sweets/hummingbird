@@ -17,8 +17,8 @@
 /* Prettify the execution of external shell scripts. */
 #define SCRIPT(X) execute("/usr/lib/hummingbird/" #X)
 
-static const char *FALLBACK_HOSTNAME = "linux";
-static const char *SHELL = "/bin/sh";
+char *FALLBACK_HOSTNAME = "linux";
+char *SHELL = "/bin/sh";
 
 static void handler(int signal);
 static void execute(char *path);
