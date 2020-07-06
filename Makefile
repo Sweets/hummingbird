@@ -7,7 +7,7 @@ INSTALL := install -Dm755
 hummingbird: hummingbird.c
 	$(CC) $(CFLAGS) hummingbird.c -o hummingbird
 
-install: hummingbird seed_install
+install: hummingbird
 	mkdir -p "$(DESTDIR)/usr/lib/hummingbird"
 	dd count=1 bs=512 if=/dev/urandom of="$(DESTDIR)/usr/lib/hummingbird/random.seed"
 
