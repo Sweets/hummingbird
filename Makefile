@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -O2 -Wall -Werror -pedantic -std=c99
+CFLAGS := -O2 -Wall -Werror -Wno-unused-variable -pedantic -std=gnu99
 INSTALL := install -Dm755
 
 .PHONY: clean install
