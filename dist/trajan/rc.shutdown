@@ -1,0 +1,18 @@
+#!/bin/sh
+
+. /usr/lib/init/rc.lib
+
+for file in /etc/rc.d/*.pre.shutdown; do
+    [ -f "$file" ] && . "$file"
+done
+
+rm -r /tmp/*
+dd count=1 bs=512 if=/dev/random of=/var/random.seed
+
+# killall processes
+
+umount -a -l
+umount -a
+
+mount -o remount,ro /
+krnlctl disk sync
