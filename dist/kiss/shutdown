@@ -2,7 +2,7 @@
 
 . /usr/lib/hummingbird/rc.lib
 
-for file in /etc/rc.d/*.pre.shutdown; do
+for file in /etc/hummingbird.d/*.pre.shutdown /etc/rc.d/*.pre.shutdown; do
     [ -f "$file" ] && . "$file"
 done
 
