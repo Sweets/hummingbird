@@ -16,4 +16,3 @@ umount -a -l
 umount -a
 
 mount -o remount,ro /
-sync
