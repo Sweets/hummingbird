@@ -40,6 +40,6 @@ setup_sysctl
 
 ip link set up dev lo
 
-for file in /etc/hummingbird.d/*.boot; do
+for file in /etc/hummingbird.d/*.boot /etc/rc.d/*.boot; do
     [ -f "$file" ] && . "$file"
 done
