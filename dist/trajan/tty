@@ -5,7 +5,7 @@
 setup_tty(){
     for index in 1 2 3 4 5 6; do
         while :; do
-            getty 38400 "tty${index}" linux
+            krnlctl req tty {index}
         done &
     done
 
