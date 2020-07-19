@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. /usr/lib/hummingbird/rc
+. /usr/lib/hummingbird/rc.lib
 
 mkdir -pm 0755 /run/runit /run/lvm /run/user /run/lock /run/log \
     /dev/pts /dev/shm

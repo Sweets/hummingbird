@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. /usr/lib/hummingbird/rc
+. /usr/lib/hummingbird/rc.lib
 
 setup_hotplug(){
     if command -v udevd >/dev/null; then

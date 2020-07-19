@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. /usr/lib/init/rc.lib
+. /usr/lib/hummingbird/rc.lib
 
 for file in /etc/rc.d/*.pre.shutdown; do
     [ -f "$file" ] && . "$file"
