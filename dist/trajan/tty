@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. /usr/lib/hummingbird/rc
+
+setup_tty(){
+    for index in 1 2 3 4 5 6; do
+        while :; do
+            krnlctl req tty {index}
+        done &
+    done
+
+    wait
+}
+
+setup_tty

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+. /usr/lib/hummingbird/rc
+
+setup_hotplug(){
+    if command -v udevd >/dev/null; then
+        udevd -d
+        udevadm trigger -c add -t subsystems
+        udevadm trigger -c add -t devices
+        udevadm trigger -c change -t devices
+        udevadm settle
+    fi
+}
+
+setup_hotplug
+
+krnlctl reach net init
+
+for file in /etc/hummingbird.d/*.boot; do
+    [ -f "$file" ] && . "$file"
+done
