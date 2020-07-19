@@ -14,7 +14,7 @@ setup_hotplug(){
 
 setup_hotplug
 
-krnlctl net init
+krnlctl reach net init
 
 for file in /etc/hummingbird.d/*.boot; do
     [ -f "$file" ] && . "$file"

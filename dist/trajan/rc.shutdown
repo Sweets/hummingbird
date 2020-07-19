@@ -15,4 +15,4 @@ umount -a -l
 umount -a
 
 mount -o remount,ro /
-krnlctl disk sync
+krnlctl reach disk sync
