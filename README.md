@@ -12,4 +12,25 @@
 <img src="https://img.shields.io/github/repo-size/Sweets/hummingbird.svg?color=green">
 </div>
 
-Hummingbird 
+"<i>It makes runit look like systemd</i>"
+
+# about
+
+hummingbird is an init system designed for speed.
+It does nothing more than start the system and stop the system by default. There are three main "runlevels", `fs` which is called directly after the psuedo filesystems necessary for the system to run have been mounted, `interlude` which is ran before dropping the user into a tty, and `tty` which is what is responsible for actually starting ttys.
+
+# installation
+
+```
+$ git clone https://github.com/Sweets/hummingbird
+$ cd ./hummingbird
+$ make
+$ sudo make install
+```
+
+### additional files
+
+If your distribution has any files specific to it, they can be found in `dist`. Replace everything in `/usr/lib/hummingbird` with your distribution specific files for optimal usage with your distribution.
+
+If they're not available, feel free to contribute them, or request them.
+
