@@ -106,6 +106,9 @@ static void handler(int signal) {
         case SIGUSR1:
             flag = LINUX_REBOOT_CMD_POWER_OFF;
             break;
+        case SIGCHLD:
+            waitpid(-1, NULL, WNOHANG);
+            return;
         default:
             return;
     }
