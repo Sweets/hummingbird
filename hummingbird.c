@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
     }
 
     signal(SIGUSR1, handler);
-    signal(SIGINT, handler);
+    signal(SIGINT,  handler);
+    signal(SIGCHLD, handler);
 
     mount("proc", "/proc", "proc",     MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL);
     mount("sys",  "/sys",  "sysfs",    MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL);
