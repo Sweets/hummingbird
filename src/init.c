@@ -15,7 +15,7 @@
 #include "hummingbird.h"
 #include "init.h"
 
-void mount_psuedo_filesystems() {
+void mount_pseudo_filesystems() {
     mount("proc", "/proc", "proc",     MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL);
     mount("sys",  "/sys",  "sysfs",    MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL);
     mount("run",  "/run",  "tmpfs",    MS_NOSUID | MS_NODEV,      "mode=0755");

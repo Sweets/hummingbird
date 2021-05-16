@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
             signal(index, handle_signal);
 
     /* zoom. */
-    mount_psuedo_filesystems();
+    mount_pseudo_filesystems();
     execute("/usr/lib/hummingbird/fs");
 
     set_hostname();
