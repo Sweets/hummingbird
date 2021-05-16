@@ -17,7 +17,7 @@
 # about
 
 hummingbird is an init system designed for speed.
-It does nothing more than start the system and stop the system by default. There are three main "runlevels", `fs` which is called directly after the psuedo filesystems necessary for the system to run have been mounted, `interlude` which is ran before dropping the user into a tty, and `tty` which is what is responsible for actually starting ttys.
+It does nothing more than start the system and stop the system by default. There are three main "runlevels", `fs` which is called directly after the pseudo filesystems necessary for the system to run have been mounted, `interlude` which is ran before dropping the user into a tty, and `tty` which is what is responsible for actually starting ttys.
 
 # installation
 
