@@ -8,7 +8,7 @@
 #include "shutdown.h"
 
 static void clear_directory(char*);
-static void seed_rng_device(void);
+//static void seed_rng_device(void);
 
 void shutdown_system() {
     execute("/usr/lib/hummingbird/shutdown");
