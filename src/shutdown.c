@@ -29,7 +29,7 @@ static void clear_directory(char *temp_path) {
 
     char *full_path;
     while ((entry = readdir(directory))) {
-        full_path = (char *)calloc(sizeof(char), strlen_temp_path + strlen(entry->d_name));
+        full_path = (char *)calloc(strlen_temp_path + strlen(entry->d_name), sizeof(char));
 
         sprintf(full_path, "%s/%s", temp_path, entry->d_name);
         remove(full_path);
