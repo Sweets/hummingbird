@@ -5,7 +5,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <mntent.h>
+#include <sys/syscall.h>
 #include <sys/mount.h>
+#include <linux/random.h>
 
 #include "hummingbird.h"
 #include "shutdown.h"
@@ -64,7 +66,7 @@ static void clear_directory(char *temp_path) {
 
 static void seed_rng_device() {
     void *seed = calloc(64, sizeof(char));
-    if (getentropy(seed, 512) < 0) {
+    if (syscall(SYS_getrandom, seed, 512, 0) < 0) {
         free(seed); // well fuck
         return;
     }
