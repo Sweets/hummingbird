@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <mntent.h>
-#include <sys/random.h>
 #include <sys/mount.h>
 
 #include "hummingbird.h"
@@ -26,15 +25,15 @@ void shutdown_system() {
 }
 
 static void unmount_filesystems() {
-    struct mntent *mount;
+    struct mntent *mount_point;
     FILE *mounts = setmntent("/proc/mounts", "r");
 
     if (!mounts)
         return; // Well this is an issue.
 
-    while ((mount = getmntent(mounts)))
-        if (umount(mount->mnt_dir) < 0)
-            mount(NULL, mount->mnt_dir, NULL, MS_REMOUNT | MS_RDONLY, NULL);
+    while ((mount_point = getmntent(mounts)))
+        if (umount(mount_point->mnt_dir) < 0)
+            mount(NULL, mount_point->mnt_dir, NULL, MS_REMOUNT | MS_RDONLY, NULL);
         // if unmount fails, mount as read only
 
     endmntent(mounts);
