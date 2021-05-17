@@ -12,7 +12,7 @@
 <img src="https://img.shields.io/github/repo-size/Sweets/hummingbird.svg?color=green">
 </div>
 
-"<i>It makes runit look like systemd</i>" —<a href="https://github.com/wooosh/">wooosh</a>
+"<i>It makes runit look like systemd</i>" —<a href="https://github.com/wooosh/">wooosh</a><br/>
 "<i>the antithesis of systemd</i>" —<a href="https://www.reddit.com/r/linux/comments/ndnwzx/hummingbird_a_lightning_fast_linux_init/gyegkkd/">u/ocean-noice</a>
 
 # about
