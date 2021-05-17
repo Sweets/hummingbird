@@ -4,8 +4,8 @@ INSTALL := install -Dm755
 
 .PHONY: clean install
 
-hummingbird: src/signal.c src/init.c src/hummingbird.c
-	$(CC) $(CFLAGS) src/signal.c src/init.c src/hummingbird.c -o hummingbird
+hummingbird: src/signal.c src/shutdown.c src/init.c src/hummingbird.c
+	$(CC) $(CFLAGS) src/signal.c src/shutdown.c src/init.c src/hummingbird.c -o hummingbird
 
 install: hummingbird
 	mkdir -p "$(DESTDIR)/usr/lib/hummingbird"

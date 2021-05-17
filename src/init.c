@@ -15,14 +15,32 @@
 #include "hummingbird.h"
 #include "init.h"
 
-void mount_pseudo_filesystems() {
+static void mount_pseudo_filesystems(void);
+static void seed_rng_device(void);
+static void set_hostname(void);
+static void disable_three_finger_salute(void);
+
+void boot_system() {
+    mount_pseudo_filesystems();
+    execute("/usr/lib/hummingbird/fs");
+
+    set_hostname();
+    seed_rng_device();
+
+    execute("/usr/lib/hummingbird/interlude");
+
+    disable_three_finger_salute();
+    execute("/usr/lib/hummingbird/tty");
+}
+
+static void mount_pseudo_filesystems() {
     mount("proc", "/proc", "proc",     MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL);
     mount("sys",  "/sys",  "sysfs",    MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL);
     mount("run",  "/run",  "tmpfs",    MS_NOSUID | MS_NODEV,      "mode=0755");
     mount("dev",  "/dev",  "devtmpfs", MS_NOSUID,                 "mode=0755");
 }
 
-void seed_rng_device() {
+static void seed_rng_device() {
     void *seed;
     struct stat status;
     int fd = open("/usr/lib/hummingbird/random.seed", O_RDONLY);
@@ -46,7 +64,7 @@ void seed_rng_device() {
     munmap(seed, status.st_size);
 }
 
-void set_hostname() {
+static void set_hostname() {
     struct stat status;
     void *mapped_file = MAP_FAILED;
     char *hostname = "linux";
@@ -71,11 +89,10 @@ void set_hostname() {
         munmap(mapped_file, status.st_size);
 }
 
-void disable_three_finger_salute() {
+static void disable_three_finger_salute() {
     // Pressing Ctrl+Alt+Del before this call will cause a system reboot.
     reboot(LINUX_REBOOT_CMD_CAD_OFF);
 }
-
 
 void drop_to_emergency_shell() {
     fputs("Init failed, dropping into emergency root shell.", stderr);

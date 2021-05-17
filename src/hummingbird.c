@@ -7,6 +7,7 @@
 
 #include "hummingbird.h"
 #include "init.h"
+#include "shutdown.h"
 #include "signal.h"
 
 void execute(char *path) {
@@ -29,7 +30,7 @@ void handle_signal(int received) {
     if (!signal_map[received] || !(flag = signal_map[received]()))
         return;
     
-    sync();
+    shutdown_system();
     reboot(flag);
 }
 
@@ -45,18 +46,7 @@ int main(int argc, char **argv) {
         if (signal_map[index])
             signal(index, handle_signal);
 
-    /* zoom. */
-    mount_pseudo_filesystems();
-    execute("/usr/lib/hummingbird/fs");
-
-    set_hostname();
-    seed_rng_device();
-
-    execute("/usr/lib/hummingbird/interlude");
-
-    disable_three_finger_salute();
-    execute("/usr/lib/hummingbird/tty");
-
+    boot_system();
     drop_to_emergency_shell();
     handle_signal(SIGINT); // reboot the machine
 
