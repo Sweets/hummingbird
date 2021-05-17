@@ -4,11 +4,14 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <mntent.h>
 #include <sys/random.h>
+#include <sys/mount.h>
 
 #include "hummingbird.h"
 #include "shutdown.h"
 
+static void unmount_filesystems(void);
 static void clear_directory(char*);
 static void seed_rng_device(void);
 
@@ -18,6 +21,23 @@ void shutdown_system() {
     clear_directory("/var/tmp");
     seed_rng_device();
     sync();
+
+    unmount_filesystems();
+}
+
+static void unmount_filesystems() {
+    struct mntent *mount;
+    FILE *mounts = setmntent("/proc/mounts", "r");
+
+    if (!mounts)
+        return; // Well this is an issue.
+
+    while ((mount = getmntent(mounts)))
+        if (umount(mount->mnt_dir) < 0)
+            mount(NULL, mount->mnt_dir, NULL, MS_REMOUNT | MS_RDONLY, NULL);
+        // if unmount fails, mount as read only
+
+    endmntent(mounts);
 }
 
 static void clear_directory(char *temp_path) {
