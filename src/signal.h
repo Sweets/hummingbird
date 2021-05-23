@@ -6,7 +6,7 @@
 #define SIGUNUSED SIGSYS
 #endif
 
-int (*signal_map[SIGUNUSED])(void);
+extern int (*signal_map[SIGUNUSED])(void);
 
 int restart_machine(void);
 int poweroff_machine(void);
