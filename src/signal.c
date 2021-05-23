@@ -21,5 +21,5 @@ int poweroff_machine() {
 
 int reap_children() {
     waitpid(-1, NULL, WNOHANG);
-    return 0;
+    return -1;
 }

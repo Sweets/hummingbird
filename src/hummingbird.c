@@ -27,7 +27,7 @@ void execute(char *path) {
 void handle_signal(int received) {
     int flag;
 
-    if (!signal_map[received] || !(flag = signal_map[received]()))
+    if (!signal_map[received] || (flag = signal_map[received]()) < 0)
         return;
     
     shutdown_system();
