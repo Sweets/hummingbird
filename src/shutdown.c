@@ -65,7 +65,7 @@ static void clear_directory(char *temp_path) {
 }
 
 static void seed_rng_device() {
-    void *seed = calloc(64, sizeof(char));
+    void *seed = calloc(512, sizeof(char));
     if (syscall(SYS_getrandom, seed, 512, 0) < 0) {
         free(seed); // well fuck
         return;
