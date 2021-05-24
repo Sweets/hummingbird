@@ -33,7 +33,7 @@ static void unmount_filesystems() {
         return; // Well this is an issue.
 
     while ((mount_point = getmntent(mounts)))
-        if (!strcmp(mount_point->mnt_dir, "/") || umount(mount_point->mnt_dir) < 0)
+        if (strcmp(mount_point->mnt_dir, "/") == 0 || umount(mount_point->mnt_dir) < 0)
             mount(NULL, mount_point->mnt_dir, NULL, MS_REMOUNT | MS_RDONLY, NULL);
         // if unmount fails, mount as read only
 

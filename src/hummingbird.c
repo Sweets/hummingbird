@@ -11,7 +11,7 @@
 #include "signal.h"
 
 void execute(char *path) {
-    if (access(path, X_OK))
+    if (access(path, X_OK) < 0)
         return;
 
     char *command[] = {path, NULL};
