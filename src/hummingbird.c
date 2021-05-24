@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     unsigned char index = 0;
     for (; index < SIGUNUSED; index++)
         if (signal_map[index])
-            signal(index, handle_signal);
+            signal(index, handle_signal); // TODO: signal() -> sigaction()
 
     boot_system();
     drop_to_emergency_shell();
