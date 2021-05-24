@@ -55,6 +55,9 @@ static void clear_directory(char *temp_path) {
     while ((entry = readdir(directory))) {
         full_path = (char *)calloc(strlen_temp_path + strlen(entry->d_name), sizeof(char));
 
+        if (!full_path)
+            continue;
+
         sprintf(full_path, "%s/%s", temp_path, entry->d_name);
         remove(full_path);
 
@@ -66,6 +69,10 @@ static void clear_directory(char *temp_path) {
 
 static void seed_rng_device() {
     void *seed = calloc(512, sizeof(char));
+
+    if (!seed)
+        return;
+
     if (syscall(SYS_getrandom, seed, 512, 0) < 0) {
         free(seed); // well fuck
         return;
