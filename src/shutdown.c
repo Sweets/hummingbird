@@ -19,7 +19,6 @@ static void seed_rng_device(void);
 void shutdown_system() {
     execute("/usr/lib/hummingbird/shutdown");
     clear_directory("/tmp");
-    clear_directory("/var/tmp");
     seed_rng_device();
     sync();
 
