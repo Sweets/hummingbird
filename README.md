@@ -13,7 +13,8 @@
 </div>
 
 "<i>It makes runit look like systemd</i>" —<a href="https://github.com/wooosh/">wooosh</a><br/>
-"<i>the antithesis of systemd</i>" —<a href="https://www.reddit.com/r/linux/comments/ndnwzx/hummingbird_a_lightning_fast_linux_init/gyegkkd/">u/ocean-noice</a>
+"<i>the antithesis of systemd</i>" —<a href="https://www.reddit.com/r/linux/comments/ndnwzx/hummingbird_a_lightning_fast_linux_init/gyegkkd/">u/ocean-noice</a><br/>
+<a href="https://nosystemd.org">No systemd</a>
 
 # about
 
@@ -28,10 +29,18 @@ $ cd ./hummingbird
 $ make
 $ sudo make install
 ```
-
 ### additional files
 
 If your distribution has any files specific to it, they can be found in `dist`. Replace everything in `/usr/lib/hummingbird` with your distribution specific files for optimal usage with your distribution.
 
 If they're not available, feel free to contribute them, or request them.
 
+# work on hummingbird
+
+As a developer, I feel that the functionality of hummingbird has reached what I envisioned it to. This is not to say that the project is dead by any means — I simply have nothing more to add to it. That being said though, if you ever feel there's an issue with hummingbird, open an issue. It will be addressed as soon as I can get to it.
+
+Don't ever be intimidated by the last commit date being a long time in the past. If you see I've made commits on other projects in the last year, rest assured I'll get to your issue.
+
+# usage
+
+Feel free to use hummingbird on your own personal installation, on any sort of embedded system you wish, hell, if you're a distribution developer, feel free to ship it as the init if you're so inclined. hummingbird is licensed under the MIT license — the world is your oyster. If you have any cool projects that use hummingbird, feel free to make a pull request or an issue showing how it's being used, it'll be listed on the repository README.
