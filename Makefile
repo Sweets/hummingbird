@@ -14,6 +14,10 @@ install: hummingbird
 	$(INSTALL) hummingbird "$(DESTDIR)/usr/bin/hummingbird"
 	$(INSTALL) bin/shutdown "$(DESTDIR)/usr/bin/shutdown"
 	$(INSTALL) bin/reboot "$(DESTDIR)/usr/bin/reboot"
+	
+	$(INSTALL) usr/lib/hummingbird/fs "$(DESTDIR)/usr/lib/hummingbird/fs"
+	$(INSTALL) usr/lib/hummingbird/tty "$(DESTDIR)/usr/lib/hummingbird/tty"
+	$(INSTALL) usr/lib/hummingbird/shutdown "$(DESTDIR)/usr/lib/hummingbird/shutdown"
 
 clean:
 	rm hummingbird
