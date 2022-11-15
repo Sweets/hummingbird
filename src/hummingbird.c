@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 #include <sys/wait.h>
 
 #include "hummingbird.h"
@@ -19,7 +20,7 @@ void execute(char *path) {
     if (pid == 0)
         execv(path, command);
     else if (pid)
-        waitpid(pid, NULL, 0);
+        do { errno = 0; waitpid(pid, NULL, 0); } while (errno == EINTR);
 }
 
 int main(int argc, char **argv) {
