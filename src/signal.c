@@ -46,6 +46,6 @@ int poweroff_machine() {
 }
 
 int reap_children() {
-    waitpid(-1, NULL, WNOHANG);
+    while(waitpid(-1, NULL, WNOHANG) > 0);
     return -1;
 }
