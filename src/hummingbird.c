@@ -19,8 +19,11 @@ void execute(char *path) {
 
     if (pid == 0)
         execv(path, command);
-    else if (pid)
-        do { errno = 0; waitpid(pid, NULL, 0); } while (errno == EINTR);
+    else if (pid) {
+        do {
+            waitpid(pid, NULL, 0);
+        } while (errno == EINTR);
+    }
 }
 
 int main(int argc, char **argv) {
