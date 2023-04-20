@@ -21,6 +21,6 @@
 
 mkdir -p -m0755 /dev/pts /dev/shm /run/lock
 
-mount remount,rw /
+mount -o remount,rw /
 mount -a
 swapon -a
