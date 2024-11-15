@@ -29,11 +29,23 @@ $ cd ./hummingbird
 $ make
 $ sudo make install
 ```
+
 ### additional files
 
 If your distribution has any files specific to it, they can be found in `dist`. Replace everything in `/usr/lib/hummingbird` with your distribution specific files for optimal usage with your distribution.
 
 If they're not available, feel free to contribute them, or request them.
+
+# supported compilers
+
+Hummingbird is known to build with the following C compilers:
+
+- [GNU Compiler Collection (GCC)](https://gcc.gnu.org/)
+- [Clang](https://clang.llvm.org/)
+- [cproc](https://sr.ht/~mcf/cproc/)
+- [Kefir](https://git.sr.ht/~jprotopopov/kefir)
+
+Building with a compiler not listed here? Add it and send a pull request!
 
 # work on hummingbird
 
