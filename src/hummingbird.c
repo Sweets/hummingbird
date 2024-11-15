@@ -28,7 +28,7 @@ void execute(char *path) {
 
 int main(int argc, char **argv) {
     if (getpid() != 1) {
-        fputs("Hummingbird must be ran as PID 1.", stderr);
+        fputs("Hummingbird must be ran as PID 1.\n", stderr);
         return EXIT_FAILURE;
     }
 
