@@ -44,6 +44,7 @@ Hummingbird is known to build with the following C compilers:
 - [Clang](https://clang.llvm.org/)
 - [cproc](https://sr.ht/~mcf/cproc/)
 - [Kefir](https://git.sr.ht/~jprotopopov/kefir)
+- [Tiny C Compiler (TCC)](https://www.bellard.org/tcc/)
 
 Building with a compiler not listed here? Add it and send a pull request!
 
